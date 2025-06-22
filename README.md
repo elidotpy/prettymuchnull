@@ -42,11 +42,11 @@ You can check the code, if you still don't believe me :P
 
 ## How to run?
 
-0 - make sure the server is running / the lan is created
-1 - Clone the repository
-2 - run `npm install` inside the folder created
-2.1 - wait...
-3 - run node app.js
+* 0 - make sure the server is running / the lan is created
+* 1 - Clone the repository
+* 2 - run `npm install` inside the folder created
+* 2.1 - wait...
+* 3 - run node app.js
 
 
 ## Null is a Steve. Help.
