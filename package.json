@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
+    "@google/genai": "^1.6.0",
     "mineflayer": "^4.29.0"
   }
 }

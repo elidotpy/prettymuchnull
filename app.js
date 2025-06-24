@@ -1,39 +1,51 @@
 // this is a null-like mineflayer bot
-// credits go to The Broken Script for creating the Null i'm basing this on
+// credits goes to The Broken Script for creating the Null i'm basing this on
 
+// --- IMPORTS ---
 import mineflayer from 'mineflayer'
-// import { GoogleGenAI } from '@google/genai' // future thingy, ignore
+import { removePunctuation, sleep } from './utils.js'
+// /-- IMPORTS --/
 
+// --- SETTING THINGS UP ---
 const bot = mineflayer.createBot({
     host: 'localhost', // testing
     username: 'Null', // username
 })
 
-const friends = [] // future thingy, ignore
-const trust = [] // future thingy, ignore
+const playersObject = {}
+let anger = 0
+// /-- SETTING THINGS UP --/
 
-bot.once("spawn", () => {
-    bot.chat(`/skin set web classic \"https://s.namemc.com/i/51696e2d4cbfbe4f.png\" ${bot.username}`) // only works with skin restorer, if it aint installed, nothing happens
-})
-
-
-function removePunctuation(str) {
-    return str.replace(/[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g, '');
+// --- HELPER FUNCTIONS / CLASSES ---
+class Player {
+    trust = 0
+    isFriend = false
+    friendship = 0
 }
 
+function kill(username) {
+    bot.chat("/gamerule showDeathMessages false")
+    bot.chat(`/kill ${username}`)
+    bot.chat(`/tellraw @a ["",{"text":"${username} was "},{"text":"killed ","obfuscated":true,"color":"dark_red"},{"text":"by "},{"text":"Null","italic":true,"underlined":true,"strikethrough":true,"color":"black"}]`)
+    bot.chat("/gamerule showDeathMessages true")
+}
 
 async function handleChat(username, message) {
     if (username === bot.username) return
-    console.log(message)
-    await new Promise((resolve, reject) => {
-        setTimeout(() => { resolve() }, 1000)
-    })
+    if (!playersObject[username]) {
+        playersObject[username] = new Player()
+    }
+    await sleep(1000)
     switch (removePunctuation(message.toLowerCase())) {
         case "hello":
-            bot.chat("err.type=null.hello")
-            return
         case "hi":
-            bot.chat("err.type=null.hello")
+            if (anger < 20) {
+                bot.chat("err.type=null.hello")
+            } else {
+                bot.chat("err.type=null.bye")
+                await sleep(200)
+                kill(username)
+            }
             return
         case "void":
             bot.chat("It's me.")
@@ -81,105 +93,142 @@ async function handleChat(username, message) {
             bot.chat("is behind you.")
             return
         case "null":
-            bot.chat("The end is nigh.")
-            await new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    resolve()
-                }, 500)
-            })
-            bot.chat("The end is null.")
-            await new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    resolve()
-                }, 1000)
-            })
-            bot.chat(`/effect give ${username} minecraft:blindness infinite 255 true`)
-            await new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    resolve()
-                }, 5000)
-            })
-            bot.chat("/gamerule showDeathMessages false")
-            bot.chat(`/kill ${username}`)
-            bot.chat(`/tellraw @a ["",{"text":"${username} was "},{"text":"killed ","obfuscated":true,"color":"dark_red"},{"text":"by "},{"text":"Null","italic":true,"underlined":true,"strikethrough":true,"color":"black"}]`)
-            bot.chat("/gamerule showDeathMessages true")
-            return
+            if (!isPlayerFriend(username)) {
+                bot.chat("The end is nigh.")
+                await sleep(500)
+                bot.chat("The end is null.")
+                await sleep(1000)
+                bot.chat(`/effect give ${username} minecraft:blindness infinite 255 true`)
+                await sleep(5000)
+                kill(username)
+                return
+            } else {
+                bot.chat("Yes?")
+                return
+            }
         case "friends":
-            bot.chat("No.")
-            bot.chat(`/kill ${username}`)
+            if (!isPlayerFriend(username)) {
+                if (anger > 20) {
+                    bot.chat("NO!")
+                    kill(username)
+                    playersObject[username].trust -= 10
+                } else if (getPlayerTrust(username) > 20) {
+                    console.log(getPlayerTrust(username))
+                    bot.chat("Yes.")
+                    playersObject[username].isFriend = true
+                } else {
+                    bot.chat("No.")
+                }
+            } else {
+                console.log("A friend.")
+                bot.chat("Yes.")
+            }
             return
         case "fuck you":
-            bot.chat("/gamerule showDeathMessages false")
-            bot.chat(`/kill ${username}`)
-            bot.chat(`/tellraw @a ["",{"text":"${username} was "},{"text":"killed ","obfuscated":true,"color":"dark_red"},{"text":"by "},{"text":"Null","italic":true,"underlined":true,"strikethrough":true,"color":"black"}]`)
-            bot.chat("/gamerule showDeathMessages true")
-            return
         case "fucker":
-            bot.chat("/gamerule showDeathMessages false")
-            bot.chat(`/kill ${username}`)
-            bot.chat(`/tellraw @a ["",{"text":"${username} was "},{"text":"killed ","obfuscated":true,"color":"dark_red"},{"text":"by "},{"text":"Null","italic":true,"underlined":true,"strikethrough":true,"color":"black"}]`)
-            bot.chat("/gamerule showDeathMessages true")
-            return
         case "asshole":
-            bot.chat("/gamerule showDeathMessages false")
-            bot.chat(`/kill ${username}`)
-            bot.chat(`/tellraw @a ["",{"text":"${username} was "},{"text":"killed ","obfuscated":true,"color":"dark_red"},{"text":"by "},{"text":"Null","italic":true,"underlined":true,"strikethrough":true,"color":"black"}]`)
-            bot.chat("/gamerule showDeathMessages true")
-            return
         case "ass hole":
-            bot.chat("/gamerule showDeathMessages false")
-            bot.chat(`/kill ${username}`)
-            bot.chat(`/tellraw @a ["",{"text":"${username} was "},{"text":"killed ","obfuscated":true,"color":"dark_red"},{"text":"by "},{"text":"Null","italic":true,"underlined":true,"strikethrough":true,"color":"black"}]`)
-            bot.chat("/gamerule showDeathMessages true")
-            return
         case "piece of shit":
-            bot.chat("/gamerule showDeathMessages false")
-            bot.chat(`/kill ${username}`)
-            bot.chat(`/tellraw @a ["",{"text":"${username} was "},{"text":"killed ","obfuscated":true,"color":"dark_red"},{"text":"by "},{"text":"Null","italic":true,"underlined":true,"strikethrough":true,"color":"black"}]`)
-            bot.chat("/gamerule showDeathMessages true")
+            kill(username)
             return
         case "do you see me":
             bot.chat("Yes.")
-            await new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    resolve()
-                }, 1500)
-            })
+            await sleep(1500)
             bot.chat("Hello.")
             return
-        case "event": // testing, ignore all of this. really, dont even mention this, this is not even in version 0.1 yet
-            let players = Object.keys(bot.players)
-            players = players.filter((value) => {
+        case "calm down null":
+            if (!isPlayerFriend(username)) {
+                if (getPlayerTrust(username) < 30) { // not friend, not trusted, therefore, Normal
+                    if (anger < 30) { // not friend, not trusted, null is not mad
+                        if (Math.random() < 0.1) {
+                            anger -= 5
+                            bot.chat("...")
+                        } else {
+                            anger += 5
+                            bot.chat("No.")
+                        }
+                    } else { // not friend, not trusted, null is mad
+                        bot.chat("NO!")
+                        anger += 10
+                        kill(username)
+                    }
+                    return
+                } else if (getPlayerTrust(username) >= 30) { // not friend, trusted
+                    if (Math.random() < 4 / 9) {
+                        anger -= 2.5
+                        bot.chat("...")
+                    } else {
+                        anger += 3
+                        bot.chat("No.")
+                    }
+                    return
+                }
+            } else { // friend
+                if (Math.random() < 3 / 7) {
+                    anger -= 2.5
+                    bot.chat("...")
+                } else {
+                    anger += 3
+                    bot.chat("No.")
+                }
+            }
+        case "test":
+            playersObject[username].trust += 10
+            return
+        case "event":
+            let players = Object.keys(bot.players).filter((value) => {
                 return value !== bot.username
             })
+
             console.log("running event")
-            const event = Math.floor(Math.random() * 2)
+            const event = Math.floor(Math.random() * 3) // because theres only one event still
             const who = players[Math.floor(Math.random() * players.length)]
-            switch (event){
-                case 0:
+            switch (event) {
+                case 0: // bath
                     bot.chat(`/execute positioned as ${who} run setblock ~ ~100 ~ water`)
                     return
-                case 1:
-                    bot.chat(`/give ${who} written_book[written_book_content={pages:["{\"text\":\"I am here\",\"underlined\":true,\"color\":\"dark_red\"}"],title:"Custom Book",author:Player}]`)
+                case 1: // rp-tp
+                    bot.chat(`/tp ${who}`)
                     return
-                    
+                case 2: // little scare
+                    bot.chat(`/title ${who} actionbar "You feel like you're being watched."`)
+                    return
             }
-            }
-            return
+    }
+
 }
+
+function isPlayerFriend(username) {
+    return playersObject[username].isFriend
+}
+
+function getPlayerTrust(username) {
+    return playersObject[username].trust
+}
+
+function getPlayerFriendship(username) {
+    return playersObject[username].friendship
+}
+
+// /-- HELPER FUNCTIONS --/
+
+// --- LISTENERS --- (?)
+bot.once("spawn", () => {
+    bot.chat(`/skin set web classic \"https://s.namemc.com/i/51696e2d4cbfbe4f.png\" ${bot.username}`) // only works with skin restorer, if it aint installed, nothing happens
+})
 
 bot.on('chat', async (username, message) => {
     handleChat(username, message)
 })
 
 bot.on("physicTick", () => {
-    const where = bot.nearestEntity(
+    const nearestPlayer = bot.nearestEntity(
         (entity) => {
             return entity.type === "player"
         }
     )
-    if (where) {
-        bot.lookAt(where.position.offset(0, 1.6, 0))
+    if (nearestPlayer) {
+        bot.lookAt(nearestPlayer.position.offset(0, 1.6, 0))
     }
     return
 })
@@ -190,7 +239,10 @@ bot.on("whisper", (username, message) => {
 
 bot.on("death", () => {
     bot.chat(`/tellraw @a {"text":"wfasfsafwagsagawdfasf","underlined":true,"obfuscated":true,"color":"dark_red"}`)
+    console.log(anger)
+    anger += 10
 })
 
 bot.on('error', console.log)
 bot.on('kicked', console.log)
+// /-- LISTENERS --/

@@ -1,4 +1,4 @@
-# Pretty Much Null
+# Pretty Much Null (outdated readme)
 ## Null, from [the broken script](https://www.curseforge.com/minecraft/mc-mods/the-broken-script-official), but without any mods
 
 This is a random project that I decided to make, after failing to befriend Null, and he crashing my pc, because i really want to befriend null.
