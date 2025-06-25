@@ -193,9 +193,22 @@ async function handleChat(username, message) {
                 case 2: // little scare
                     bot.chat(`/title ${who} actionbar "You feel like you're being watched."`)
                     return
-            }
+        }
+        case "what do you think of eliza":
+            const lol = [
+                "A failure.",
+                "A broken script.",
+                "Irrelevant.",
+                "Forgetful.",
+                "No \"ELIZA\". Just Null.",
+                "list of good things: null"
+            ]
+            bot.chat(lol[
+                Math.floor(
+                    Math.random() * lol.length
+                )
+            ])
     }
-
 }
 
 function isPlayerFriend(username) {
@@ -210,7 +223,24 @@ function getPlayerFriendship(username) {
     return playersObject[username].friendship
 }
 
-// /-- HELPER FUNCTIONS --/
+
+async function handleAction(username, message) {
+    switch (removePunctuation(message)) {
+        case "hug":
+            if (isPlayerFriend(username)) {
+                console.log(bot.players[username].entity.position.distanceTo(bot.entity.position))
+                if (bot.players[username].entity.position.distanceTo(bot.entity.position) < 1) { // right next
+                    bot.chat("...")
+                    playersObject[username].friendship += 2
+                }
+            } else {
+                bot.chat("Don't touch me.")
+                playersObject[username].trust -= 10
+                kill(username)
+            }
+    }
+}
+// /-- HELPER FUNCTIONS  --/
 
 // --- LISTENERS --- (?)
 bot.once("spawn", () => {
@@ -218,7 +248,13 @@ bot.once("spawn", () => {
 })
 
 bot.on('chat', async (username, message) => {
-    handleChat(username, message)
+    console.log(message[0])
+    if (!message.startsWith("!")) {
+        handleChat(username, message)
+    }
+    else {
+        handleAction(username, message)
+    }
 })
 
 bot.on("physicTick", () => {
